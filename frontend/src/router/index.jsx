@@ -4,6 +4,8 @@ import Layout from "@/Layouts/Layout.jsx";
 import Login from "@/pages/Login.jsx";
 import UserLayout from "@/Layouts/User/UserLayout.jsx";
 import AdminLayout from "@/Layouts/Admin/AdminLayout.jsx";
+import AdminLogin from "@/components/admin/AdminLogin.jsx";
+import UserLogin from "@/components/users/UserLogin.jsx";
 
 export const redirectToDashboard = (roleType) => {
     switch (roleType) {
@@ -31,7 +33,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.user.login,
-                element: <Login/>,
+                element: <UserLogin/>,
             },
         ]
     }, {
@@ -39,7 +41,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: ROUTES.admin.login,
-                element: <Login/>,
+                element: <AdminLogin/>,
             },
         ]
     }
