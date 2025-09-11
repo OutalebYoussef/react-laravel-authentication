@@ -4,6 +4,7 @@ import {RouterProvider} from "react-router-dom";
 import {router} from "@/router/index.jsx";
 import AdminContext from "@/context/AdminContext.jsx";
 import UserContext from "@/context/UserContext.jsx";
+import {ThemeProvider} from "@/components/theme-provider.jsx";
 
 function App() {
 
@@ -11,7 +12,9 @@ function App() {
         <>
             <AdminContext>
                 <UserContext>
-                    <RouterProvider router={router}/>
+                    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                        <RouterProvider router={router}/>
+                    </ThemeProvider>
                 </UserContext>
             </AdminContext>
         </>

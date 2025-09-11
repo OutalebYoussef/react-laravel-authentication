@@ -20,6 +20,7 @@ import {Card, CardContent} from "@/components/ui/card.jsx";
 import {useAdminContext} from "@/context/AdminContext.jsx";
 import AdminApi from "@/services/AdminApi.js";
 import {PasswordInput} from "@/components/ui/password.jsx";
+import {ROUTES} from "@/router/routes.js";
 
 const formSchema = z.object({
     email: z.string().email().min(2),
@@ -40,25 +41,27 @@ function AdminLogin(props) {
     const {setError, formState: {isSubmitting}} = form
 
     const onSubmit = async values => {
-        console.log(values)
-        // await login(values.email, values.password)
-        //     .then(({ status, data }) => {
-        //         if (status === 200) {
-        //             if (data.user.role !== 'admin') {
-        //                 setError('email', { message: "Access denied: not an admin." });
-        //                 AdminApi.logout();
-        //                 logout()
-        //             }
-        //             setToken(data.token);
-        //             setAuthenticated(true);
-        //             navigate(ADMIN_DASHBOARD_ROUTE);
-        //         }
-        //     }).catch(({response}) => {
-        //         setError('email', {
-        //             message: response.data.errors.email.join()
-        //         })
-        //         isSubmitting
-        //     })
+        await login(values.email, values.password)
+            .then(({ status, data }) => {
+                if (status === 200) {
+                    if (data.user.role !== 'admin') {
+                        setError('email', { message: "Access denied: not an admin." });
+                        AdminApi.logout()
+                            .then((res) => {
+                                setAuthenticated(false)
+                                navigate(ROUTES.admin.login)
+                            })
+                    }
+                    setToken(data.token);
+                    setAuthenticated(true);
+                    navigate(ROUTES.admin.dashboard)
+                }
+            }).catch(({response}) => {
+                setError('email', {
+                    message: response.data.errors.email.join()
+                })
+                isSubmitting
+            })
 
     }
     return (

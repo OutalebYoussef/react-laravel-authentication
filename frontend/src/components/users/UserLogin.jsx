@@ -19,6 +19,7 @@ import {Loader} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.jsx";
 import {useAdminContext} from "@/context/AdminContext.jsx";
 import UserApi from "@/services/UserApi.js";
+import {ROUTES} from "@/router/routes.js";
 
 const formSchema = z.object({
     email: z.string().email().min(2),
@@ -39,24 +40,24 @@ function UserLogin(props) {
     const {setError, formState: {isSubmitting}} = form
 
     const onSubmit = async values => {
-        // await login(values.email, values.password)
-        //     .then(({ status, data }) => {
-        //         if (status === 200) {
-        //             if (data.user.role !== 'user') {
-        //                 setError('email', { message: "Access denied: not a user." });
-        //                 UserApi.logout();
-        //                 logout()
-        //             }
-        //             setToken(data.token);
-        //             setAuthenticated(true);
-        //             navigate(USER_SELECTION_ROUTE);
-        //         }
-        //     }).catch(({response}) => {
-        //         setError('email', {
-        //             message: response.data.errors.email.join()
-        //         })
-        //         isSubmitting
-        //     })
+        await login(values.email, values.password)
+            .then(({ status, data }) => {
+                if (status === 200) {
+                    if (data.user.role !== 'user') {
+                        setError('email', { message: "Access denied: not a user." });
+                        UserApi.logout();
+                        logout()
+                    }
+                    setToken(data.token);
+                    setAuthenticated(true);
+                    navigate(ROUTES.user.dashboard);
+                }
+            }).catch(({response}) => {
+                setError('email', {
+                    message: response.data.errors.email.join()
+                })
+                isSubmitting
+            })
 
     }
     return (

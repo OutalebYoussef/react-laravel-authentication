@@ -6,6 +6,8 @@ import UserLayout from "@/Layouts/User/UserLayout.jsx";
 import AdminLayout from "@/Layouts/Admin/AdminLayout.jsx";
 import AdminLogin from "@/components/admin/AdminLogin.jsx";
 import UserLogin from "@/components/users/UserLogin.jsx";
+import UserDashboard from "@/components/users/UserDashboard.jsx";
+import AdminDashboard from "@/components/admin/AdminDashboard.jsx";
 
 export const redirectToDashboard = (roleType) => {
     switch (roleType) {
@@ -24,7 +26,7 @@ export const router = createBrowserRouter([
                 path: "*",
                 element: <p>Not Found.</p>,
             }, {
-                path: "/",
+                path: ROUTES.public.login,
                 element: <Login/>,
             },
         ]
@@ -34,6 +36,9 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.user.login,
                 element: <UserLogin/>,
+            },{
+                path: ROUTES.user.dashboard,
+                element: <UserDashboard/>,
             },
         ]
     }, {
@@ -42,6 +47,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.admin.login,
                 element: <AdminLogin/>,
+            },
+            {
+                path: ROUTES.admin.dashboard,
+                element: <AdminDashboard/>,
             },
         ]
     }
