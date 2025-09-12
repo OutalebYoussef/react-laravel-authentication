@@ -12,9 +12,13 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest')
     ->name('register');
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+Route::post('/login', fn(\App\Http\Requests\Auth\LoginRequest $request, AuthenticatedSessionController $ctrl) => $ctrl->store($request, 'user'))
     ->middleware('guest')
     ->name('login');
+
+Route::post('/login/admin', fn(\App\Http\Requests\Auth\LoginRequest $request, AuthenticatedSessionController $ctrl) => $ctrl->store($request, 'admin'))
+    ->middleware('guest')
+    ->name('login.admin');
 
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->middleware('guest')

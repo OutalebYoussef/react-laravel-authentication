@@ -17,9 +17,9 @@ import {axiosClient} from "@/api/axios.js";
 import {useNavigate} from "react-router-dom";
 import {Loader} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.jsx";
-import {useAdminContext} from "@/context/AdminContext.jsx";
 import UserApi from "@/services/UserApi.js";
 import {ROUTES} from "@/router/routes.js";
+import {useUserContext} from "@/context/UserContext.jsx";
 
 const formSchema = z.object({
     email: z.string().email().min(2),
@@ -27,7 +27,7 @@ const formSchema = z.object({
 })
 
 function UserLogin(props) {
-    const {login, setAuthenticated, setToken,logout} = useAdminContext()
+    const {login, setAuthenticated, setToken,logout} = useUserContext()
     const navigate = useNavigate();
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -43,18 +43,13 @@ function UserLogin(props) {
         await login(values.email, values.password)
             .then(({ status, data }) => {
                 if (status === 200) {
-                    if (data.user.role !== 'user') {
-                        setError('email', { message: "Access denied: not a user." });
-                        UserApi.logout();
-                        logout()
-                    }
                     setToken(data.token);
                     setAuthenticated(true);
                     navigate(ROUTES.user.dashboard);
                 }
             }).catch(({response}) => {
                 setError('email', {
-                    message: response.data.errors.email.join()
+                    message: response?.data?.errors?.email?.join()||response?.data?.message
                 })
                 isSubmitting
             })

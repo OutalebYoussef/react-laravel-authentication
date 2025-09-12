@@ -14,28 +14,27 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): JsonResponse
+    public function store(LoginRequest $request, string $expectedRole = 'user'): JsonResponse
     {
         $request->authenticate();
 
         $guards = ['web', 'admin'];
-        $user = null;
-        foreach ($guards as $guard) {
-            $currentGuard = Auth::guard($guard);
-            if ($currentGuard->check()) {
-                $user = $currentGuard->user();
-                break;
+        $user = collect($guards)
+            ->map(fn($guard) => Auth::guard($guard)->user())
+            ->firstWhere(fn($u) => !is_null($u));
+
+        if (!$user || $user->role !== $expectedRole) {
+            foreach ($guards as $guard) {
+                Auth::guard($guard)->logout();
             }
+            return response()->json(['message' => "Access denied: not a {$expectedRole}."], 403);
         }
 
-        if ($user) {
-            $user->update(['status' => 'online']);
-        }
-
+        $user->update(['status' => 'online']);
         $request->session()->regenerate();
 
         return response()->json([
-            'user' => $user,
+            'user'  => $user,
             'token' => $user->createToken('api', [$user->getRoleAttribute()])->plainTextToken,
         ]);
     }

@@ -44,21 +44,13 @@ function AdminLogin(props) {
         await login(values.email, values.password)
             .then(({ status, data }) => {
                 if (status === 200) {
-                    if (data.user.role !== 'admin') {
-                        setError('email', { message: "Access denied: not an admin." });
-                        AdminApi.logout()
-                            .then((res) => {
-                                setAuthenticated(false)
-                                navigate(ROUTES.admin.login)
-                            })
-                    }
                     setToken(data.token);
                     setAuthenticated(true);
                     navigate(ROUTES.admin.dashboard)
                 }
             }).catch(({response}) => {
                 setError('email', {
-                    message: response.data.errors.email.join()
+                    message: response?.data?.errors?.email?.join()||response?.data?.message
                 })
                 isSubmitting
             })
