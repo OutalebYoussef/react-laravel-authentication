@@ -21,40 +21,48 @@ import UserApi from "@/services/UserApi.js";
 import {ROUTES} from "@/router/routes.js";
 import {useUserContext} from "@/context/UserContext.jsx";
 
-const formSchema = z.object({
-    email: z.string().email().min(2),
-    password: z.string().min(2).max(30),
-})
+const formSchema = z
+    .object({
+        name: z.string().min(1, "Name is required"),
+        email: z.string().email("Invalid email"),
+        password: z.string().min(6, "Password must be at least 6 characters"),
+        password_confirmation: z.string(),
+    })
 
-function UserLogin(props) {
-    const {login, setAuthenticated, setToken, logout} = useUserContext()
+function UserRegister(props) {
+    const {register, setAuthenticated, setToken, logout} = useUserContext()
     const navigate = useNavigate();
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            name: "",
             email: "",
-            password: "123456789"
+            password: "",
+            password_confirmation: "",
         },
-    })
+    });
+
 
     const {setError, formState: {isSubmitting}} = form
 
-    const onSubmit = async values => {
-        await login(values.email, values.password)
-            .then(({status, data}) => {
+    const onSubmit = async (values) => {
+        await register(values.name, values.email, values.password, values.password_confirmation)
+            .then(({ status, data }) => {
                 if (status === 200) {
                     setToken(data.token);
                     setAuthenticated(true);
                     navigate(ROUTES.user.dashboard);
                 }
-            }).catch(({response}) => {
-                setError('email', {
-                    message: response?.data?.errors?.email?.join() || response?.data?.message
-                })
-                isSubmitting
             })
+            .catch(({ response }) => {
+                if (response?.data?.errors) {
+                    Object.entries(response.data.errors).forEach(([field, messages]) => {
+                        setError(field, { message: messages.join() });
+                    });
+                }
+            });
+    };
 
-    }
     return (
         <>
             <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -69,6 +77,19 @@ function UserLogin(props) {
                                             Login to your account
                                         </p>
                                     </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="name"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Name</FormLabel>
+                                                <FormControl>
+                                                    <Input type={'text'} placeholder="Name" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
                                     <FormField
                                         control={form.control}
                                         name="email"
@@ -95,6 +116,20 @@ function UserLogin(props) {
                                             </FormItem>
                                         )}
                                     />
+                                    <FormField
+                                        control={form.control}
+                                        name="password_confirmation"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Confirm Password</FormLabel>
+                                                <FormControl>
+                                                    <Input type="password" placeholder="Confirm Password" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
                                     <Button disabled={isSubmitting} type="submit" className={'w-full'}>
                                         {isSubmitting && <Loader className={'animate-spin'}/>}
                                         Login
@@ -135,9 +170,9 @@ function UserLogin(props) {
                                         </Button>
                                     </div>
                                     <div className="text-center text-sm">
-                                        Don&apos;t have an account?{" "}
-                                        <Link to={ROUTES.user.register} className="underline underline-offset-4">
-                                            Sign up
+                                        Do you have an account?{" "}
+                                        <Link to={ROUTES.user.login} className="underline underline-offset-4">
+                                            Login
                                         </Link>
                                     </div>
                                 </form>
@@ -159,4 +194,4 @@ function UserLogin(props) {
         ;
 }
 
-export default UserLogin;
+export default UserRegister;

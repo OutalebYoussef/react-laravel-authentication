@@ -9,6 +9,7 @@ export const UserStateContext=createContext({
     authenticated:false,
     setAuthenticated:()=>{},
     login:(email,password)=>{},
+    register:(name,email,password,password_confirmation)=>{},
     logout:()=>{},
     setToken:()=>{},
 })
@@ -18,6 +19,10 @@ export default function UserContext({children}){
 
     const login=async (email,password)=>{
         return UserApi.login(email,password)
+    }
+
+    const register=async (name,email,password,password_confirmation)=>{
+        return UserApi.register(name,email,password,password_confirmation)
     }
 
     const setToken=(token)=>{
@@ -43,6 +48,7 @@ export default function UserContext({children}){
                 authenticated,
                 setAuthenticated,
                 login,
+                register,
                 logout,
                 setToken,
             }}>

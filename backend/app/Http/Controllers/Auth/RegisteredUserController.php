@@ -18,7 +18,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): Response
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -30,12 +30,18 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
+            'role' => 'user', // default role
+            'status' => 'offline', // optional default
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Issue Sanctum token with role-based ability
+        $token = $user->createToken('api-token', [$user->role])->plainTextToken;
 
-        return response()->noContent();
+        return response()->json([
+            'user' => $user,
+            'token' => $token,
+        ], 201);
     }
 }

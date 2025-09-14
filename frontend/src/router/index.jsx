@@ -8,6 +8,7 @@ import AdminLogin from "@/components/admin/AdminLogin.jsx";
 import UserLogin from "@/components/users/UserLogin.jsx";
 import UserDashboard from "@/components/users/UserDashboard.jsx";
 import AdminDashboard from "@/components/admin/AdminDashboard.jsx";
+import UserRegister from "@/components/users/UserRegister.jsx";
 
 export const redirectToDashboard = (roleType) => {
     switch (roleType) {
@@ -36,6 +37,9 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.user.login,
                 element: <UserLogin/>,
+            },{
+                path: ROUTES.user.register,
+                element: <UserRegister/>,
             },{
                 path: ROUTES.user.dashboard,
                 element: <UserDashboard/>,

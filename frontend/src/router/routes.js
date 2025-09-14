@@ -5,6 +5,7 @@ export const ROUTES = {
 
     user: {
         login: "/user/login",
+        register: "/user/register",
         dashboard: "/user/dashboard",
     },
 
